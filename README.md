@@ -1,6 +1,8 @@
 # Alien Trilogy DOS Geometry Extraction PHP Helper Script
 This PHP script will read the header of an Alien Trilogy DOS map or model file and determine the offsets required to extract geometry to the wavefront obj format. It does not do the extraction itself but instead generates some useful information and a command line to be used with another tool, Bin2Obj by Mark E Sowden. The command line can be used directly with Bin2Obj as is or adapted for use with your binary hacking program of choice.
 
+This script is very bare bones, and has had little testing. Use at your own risk.
+
 ## Credits
 This script is entirely based on the documentation of the Alien Trilogy map and model format reverse engineered by Lex Safonov and available on the Xentax wiki here (https://web.archive.org/web/20230518104117/https://wiki.xentax.com/index.php/Alien_Trilogy_MAP)
 (https://web.archive.org/web/20230518104114/https://wiki.xentax.com/index.php/Alien_Trilogy_BND)
