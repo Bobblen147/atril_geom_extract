@@ -19,11 +19,13 @@ The $type variable at the top of the script can be set to 'map' or 'model'. Ther
 
 The $filename variable at the top of the script should be set to the name of the file you're interested in.
 
-This line '$bin = fopen("D:\\VSProjects\\Bin2Obj-master\\x64\\Debug\\".$filename, "r");' should be modified to reflect the location of the file you're interested in. Ideally that would be a variable too, but isn't yet.
+This line '$bin = fopen("D:\\Maps\\".$filename, "r");' should be modified to reflect the location of the file you're interested in. Ideally that would be a variable too, but isn't yet.
 
 ## Additional Notes
 There is an extra manual step required after using Bin2Obj to extract geometry. As per the docs, if the game wants to denote a triangle instead of a quad, it will set the 4th vertex index to FF instead of a valid value. Bin2Obj will interpret this as a 0 which isn't valid either, for this to work these 0s need to be completely removed. After extraction you should open the obj file up in a text editor and do a bulk replace of all 0 values with nothing.
 
-Also all Alien Trilogy maps appear to end with a final quad of index ff ff ff ff. This is always included in the quad count, so bin2obj will throw a warning up that all values are zero and completely ignore it. This appears to work fine and doesn't require manual action.
+It is recommended to 'sanitise' the coordinates which by default are very large values. A quick way to do this is to use Noesis (or similar) to convert the obj file to fbx.
+
+Also all Alien Trilogy maps appear to end with a final quad of index ff ff ff ff. This is always included in the quad count, so bin2obj will throw a warning up that all values are out of bounds and completely ignore it. This appears to work fine and doesn't require manual action.
 
 For models, this script cannot work on the raw files which often contain multiple models and other structures mixed together. Each model is generally denoted M00, M01 etc (see the docs for details). Use a hex editor to extract an individual model (copy from M00 text to the byte before the next header) to its own file and apply the script to that file.
