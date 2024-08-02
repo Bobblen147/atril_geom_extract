@@ -17,20 +17,22 @@ $bin = fopen("D:\\Maps\\".$filename, "r");
 
 if( $type == 'map' )
 {
-	$header = 0x14; // hardcoded length
-	$vsoffset = 56; //in decimal, always straight after header. Map format is vertexes then quads
+	$header_offset = 0x14; // the part of the header we're interested in for counts
+	$header_size = 56; //total size of header in decimal
 }
 
 if( $type == 'model' )
 {
-	$header = 0x14; // hardcoded length
-	$qsoffset = 28; //in decimal, always straight after header. Model format is quads then vertexes
+	$header_offset = 0x14; // the part of the header we're interested in for counts
+	$header_size = 28; //total size of the header in decimal
 }
 
-fseek( $bin, $header );
+fseek( $bin, $header_offset );
 
 if( $type == 'map' )
 	{
+	//get vertex start offset in decimal
+	$vsoffset = $header_size; //always straight after header. Map format is vertexes then quads
 	//get vertex count in decimal
 	$lowv = getByte($bin);
 	$highv = getByte($bin);
@@ -53,6 +55,8 @@ if( $type == 'map' )
 
 if( $type == 'model' )
 	{
+	//get quad start offset in decimal
+	$qsoffset = $header_size; //always straight after header. Model format is quads then vertexes
 	//get quad count in decimal
 	$lowq = getByte($bin);
 	$highq = getByte($bin);
