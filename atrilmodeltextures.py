@@ -1,33 +1,12 @@
 #Alien Trilogy model obj/mtl generator script by Bobblen
-model_file_name="M00"
-map_texture_mesh_file_name_00="BX00"
-map_texture_mesh_file_name_01="BX01"
-map_texture_mesh_file_name_02="BX02"
-map_texture_mesh_file_name_03="BX03"
-map_texture_mesh_file_name_04="BX04"
+model_file_name="OPTM000"
+model_texture_mesh_file_name_00="OPTBX00"
 
-#open all the texture mesh files and extract the total texture count from each one
-#for each new file we must add the count to the previous total, as the texture indexes carry over all files
-with open(map_texture_mesh_file_name_00, 'rb') as inBX00, open(map_texture_mesh_file_name_01, 'rb') as inBX01, open(map_texture_mesh_file_name_02, 'rb') as inBX02, open(map_texture_mesh_file_name_03, 'rb') as inBX03, open(map_texture_mesh_file_name_04, 'rb') as inBX04:
+#open the texture mesh files and extract the total texture count
+with open(model_texture_mesh_file_name_00, 'rb') as inBX00:
     inBX00.seek(8)
     texcountBX00raw = inBX00.read(2)
     texcountBX00 = int.from_bytes(texcountBX00raw, byteorder='little')
-    
-    inBX01.seek(8)
-    texcountBX01raw = inBX01.read(2)
-    texcountBX01 = int.from_bytes(texcountBX01raw, byteorder='little') + texcountBX00
-    
-    inBX02.seek(8)
-    texcountBX02raw = inBX02.read(2)
-    texcountBX02 = int.from_bytes(texcountBX02raw, byteorder='little') + texcountBX01
-    
-    inBX03.seek(8)
-    texcountBX03raw = inBX03.read(2)
-    texcountBX03 = int.from_bytes(texcountBX03raw, byteorder='little') + texcountBX02
-    
-    inBX04.seek(8)
-    texcountBX04raw = inBX04.read(2)
-    texcountBX04 = int.from_bytes(texcountBX04raw, byteorder='little') + texcountBX03
 
     x=0 #initialise counter, this will also double up as our identifier for each texture
     uvcoordcount=1
@@ -95,254 +74,9 @@ with open(map_texture_mesh_file_name_00, 'rb') as inBX00, open(map_texture_mesh_
 
         
         x=x+1
-    
-    inBX01.seek(10)
-    while(x<texcountBX01):
-
-        #read raw bytes
-        xposraw = inBX01.read(1)
-        yposraw = inBX01.read(1)
-        xsizeraw = inBX01.read(1)
-        ysizeraw = inBX01.read(1)
-        unknown1 = inBX01.read(1)
-        unknown2 = inBX01.read(1)
-    
-        #Extract UV
-        xpos = int.from_bytes(xposraw, byteorder='little')
-        ypos = int.from_bytes(yposraw, byteorder='little')
-        xsize = int.from_bytes(xsizeraw, byteorder='little') + 1
-        ysize = int.from_bytes(ysizeraw, byteorder='little') + 1      
-        #calculate and normalise UV
-        uvcoord1x = xpos / 256
-        uvcoord1y = ((256-ypos)-ysize) / 256
-        uvcoord2x = (xpos+xsize) / 256
-        uvcoord2y = ((256-ypos)-ysize) / 256
-        uvcoord3x = (xpos+xsize) / 256
-        uvcoord3y = (256-ypos) / 256
-        uvcoord4x = xpos / 256
-        uvcoord4y = (256-ypos) / 256
-        
-        #extract material
-        material_name = "TP01"
-        materialdict["Index{0}".format(str(x))] = x 
-        materialdict["Material{0}".format(str(x))] = material_name
-        
-        #add to UV dictionary if not exists
-        if "vt " + str(uvcoord1x) + " " + str(uvcoord1y) in uvcoordsdict.keys():
-            materialdict["UVone{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord1x) + " " + str(uvcoord1y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord1x) + " " + str(uvcoord1y)] = uvcoordcount
-            materialdict["UVone{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1       
-        if "vt " + str(uvcoord2x) + " " + str(uvcoord2y) in uvcoordsdict.keys():
-            materialdict["UVtwo{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord2x) + " " + str(uvcoord2y)) 
-        else:
-            uvcoordsdict["vt " + str(uvcoord2x) + " " + str(uvcoord2y)] = uvcoordcount
-            materialdict["UVtwo{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-            
-        if "vt " + str(uvcoord3x) + " " + str(uvcoord3y) in uvcoordsdict.keys():
-            materialdict["UVthree{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord3x) + " " + str(uvcoord3y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord3x) + " " + str(uvcoord3y)] = uvcoordcount
-            materialdict["UVthree{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-            
-        if "vt " + str(uvcoord4x) + " " + str(uvcoord4y) in uvcoordsdict.keys():
-            materialdict["UVfour{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord4x) + " " + str(uvcoord4y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord4x) + " " + str(uvcoord4y)] = uvcoordcount
-            materialdict["UVfour{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-
-        
-        x=x+1
-        
-    inBX02.seek(10)
-    while(x<texcountBX02):
-
-        #read raw bytes
-        xposraw = inBX02.read(1)
-        yposraw = inBX02.read(1)
-        xsizeraw = inBX02.read(1)
-        ysizeraw = inBX02.read(1)
-        unknown1 = inBX02.read(1)
-        unknown2 = inBX02.read(1)
-    
-        #Extract UV
-        xpos = int.from_bytes(xposraw, byteorder='little')
-        ypos = int.from_bytes(yposraw, byteorder='little')
-        xsize = int.from_bytes(xsizeraw, byteorder='little') + 1
-        ysize = int.from_bytes(ysizeraw, byteorder='little') + 1      
-        #calculate and normalise UV
-        uvcoord1x = xpos / 256
-        uvcoord1y = ((256-ypos)-ysize) / 256
-        uvcoord2x = (xpos+xsize) / 256
-        uvcoord2y = ((256-ypos)-ysize) / 256
-        uvcoord3x = (xpos+xsize) / 256
-        uvcoord3y = (256-ypos) / 256
-        uvcoord4x = xpos / 256
-        uvcoord4y = (256-ypos) / 256
-        
-        #extract material
-        material_name = "TP02"
-        materialdict["Index{0}".format(str(x))] = x 
-        materialdict["Material{0}".format(str(x))] = material_name
-        
-        #add to UV dictionary if not exists
-        if "vt " + str(uvcoord1x) + " " + str(uvcoord1y) in uvcoordsdict.keys():
-            materialdict["UVone{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord1x) + " " + str(uvcoord1y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord1x) + " " + str(uvcoord1y)] = uvcoordcount
-            materialdict["UVone{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1        
-        if "vt " + str(uvcoord2x) + " " + str(uvcoord2y) in uvcoordsdict.keys():
-            materialdict["UVtwo{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord2x) + " " + str(uvcoord2y)) 
-        else:
-            uvcoordsdict["vt " + str(uvcoord2x) + " " + str(uvcoord2y)] = uvcoordcount
-            materialdict["UVtwo{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-            
-        if "vt " + str(uvcoord3x) + " " + str(uvcoord3y) in uvcoordsdict.keys():
-            materialdict["UVthree{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord3x) + " " + str(uvcoord3y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord3x) + " " + str(uvcoord3y)] = uvcoordcount
-            materialdict["UVthree{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-            
-        if "vt " + str(uvcoord4x) + " " + str(uvcoord4y) in uvcoordsdict.keys():
-            materialdict["UVfour{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord4x) + " " + str(uvcoord4y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord4x) + " " + str(uvcoord4y)] = uvcoordcount
-            materialdict["UVfour{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-
-        
-        x=x+1
-        
-    inBX03.seek(10)
-    while(x<texcountBX03):
-
-        #read raw bytes
-        xposraw = inBX03.read(1)
-        yposraw = inBX03.read(1)
-        xsizeraw = inBX03.read(1)
-        ysizeraw = inBX03.read(1)
-        unknown1 = inBX03.read(1)
-        unknown2 = inBX03.read(1)
-    
-        #Extract UV
-        xpos = int.from_bytes(xposraw, byteorder='little')
-        ypos = int.from_bytes(yposraw, byteorder='little')
-        xsize = int.from_bytes(xsizeraw, byteorder='little') + 1
-        ysize = int.from_bytes(ysizeraw, byteorder='little') + 1      
-        #calculate and normalise UV
-        uvcoord1x = xpos / 256
-        uvcoord1y = ((256-ypos)-ysize) / 256
-        uvcoord2x = (xpos+xsize) / 256
-        uvcoord2y = ((256-ypos)-ysize) / 256
-        uvcoord3x = (xpos+xsize) / 256
-        uvcoord3y = (256-ypos) / 256
-        uvcoord4x = xpos / 256
-        uvcoord4y = (256-ypos) / 256
-        
-        #extract material
-        material_name = "TP03"
-        materialdict["Index{0}".format(str(x))] = x 
-        materialdict["Material{0}".format(str(x))] = material_name
-        
-        #add to UV dictionary if not exists
-        if "vt " + str(uvcoord1x) + " " + str(uvcoord1y) in uvcoordsdict.keys():
-            materialdict["UVone{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord1x) + " " + str(uvcoord1y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord1x) + " " + str(uvcoord1y)] = uvcoordcount
-            materialdict["UVone{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-        
-        if "vt " + str(uvcoord2x) + " " + str(uvcoord2y) in uvcoordsdict.keys():
-            materialdict["UVtwo{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord2x) + " " + str(uvcoord2y)) 
-        else:
-            uvcoordsdict["vt " + str(uvcoord2x) + " " + str(uvcoord2y)] = uvcoordcount
-            materialdict["UVtwo{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-        if "vt " + str(uvcoord3x) + " " + str(uvcoord3y) in uvcoordsdict.keys():
-            materialdict["UVthree{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord3x) + " " + str(uvcoord3y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord3x) + " " + str(uvcoord3y)] = uvcoordcount
-            materialdict["UVthree{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-            
-        if "vt " + str(uvcoord4x) + " " + str(uvcoord4y) in uvcoordsdict.keys():
-            materialdict["UVfour{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord4x) + " " + str(uvcoord4y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord4x) + " " + str(uvcoord4y)] = uvcoordcount
-            materialdict["UVfour{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-        
-        x=x+1
-    
-    inBX04.seek(10)
-    while(x<texcountBX04):
-
-        #read raw bytes
-        xposraw = inBX04.read(1)
-        yposraw = inBX04.read(1)
-        xsizeraw = inBX04.read(1)
-        ysizeraw = inBX04.read(1)
-        unknown1 = inBX04.read(1)
-        unknown2 = inBX04.read(1)
-    
-        #Extract UV
-        xpos = int.from_bytes(xposraw, byteorder='little')
-        ypos = int.from_bytes(yposraw, byteorder='little')
-        xsize = int.from_bytes(xsizeraw, byteorder='little') + 1
-        ysize = int.from_bytes(ysizeraw, byteorder='little') + 1      
-        #calculate and normalise UV
-        uvcoord1x = xpos / 256
-        uvcoord1y = ((256-ypos)-ysize) / 256
-        uvcoord2x = (xpos+xsize) / 256
-        uvcoord2y = ((256-ypos)-ysize) / 256
-        uvcoord3x = (xpos+xsize) / 256
-        uvcoord3y = (256-ypos) / 256
-        uvcoord4x = xpos / 256
-        uvcoord4y = (256-ypos) / 256
-        
-        #extract material
-        material_name = "TP04"
-        materialdict["Index{0}".format(str(x))] = x 
-        materialdict["Material{0}".format(str(x))] = material_name
-        
-        #add to UV dictionary if not exists
-        if "vt " + str(uvcoord1x) + " " + str(uvcoord1y) in uvcoordsdict.keys():
-            materialdict["UVone{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord1x) + " " + str(uvcoord1y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord1x) + " " + str(uvcoord1y)] = uvcoordcount
-            materialdict["UVone{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-        
-        if "vt " + str(uvcoord2x) + " " + str(uvcoord2y) in uvcoordsdict.keys():
-            materialdict["UVtwo{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord2x) + " " + str(uvcoord2y)) 
-        else:
-            uvcoordsdict["vt " + str(uvcoord2x) + " " + str(uvcoord2y)] = uvcoordcount
-            materialdict["UVtwo{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-            
-        if "vt " + str(uvcoord3x) + " " + str(uvcoord3y) in uvcoordsdict.keys():
-            materialdict["UVthree{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord3x) + " " + str(uvcoord3y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord3x) + " " + str(uvcoord3y)] = uvcoordcount
-            materialdict["UVthree{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-            
-        if "vt " + str(uvcoord4x) + " " + str(uvcoord4y) in uvcoordsdict.keys():
-            materialdict["UVfour{0}".format(str(x))] = uvcoordsdict.get("vt " + str(uvcoord4x) + " " + str(uvcoord4y))
-        else:
-            uvcoordsdict["vt " + str(uvcoord4x) + " " + str(uvcoord4y)] = uvcoordcount
-            materialdict["UVfour{0}".format(str(x))] = uvcoordcount
-            uvcoordcount = uvcoordcount + 1
-        
-        x=x+1
-        
+      
+#print material library header
+print("mtllib Materials\\" + str(model_file_name) + ".mtl")
 #print uv
 for keys in uvcoordsdict.keys():
     print(keys)
@@ -392,8 +126,21 @@ with open(model_file_name, 'rb') as inMOD:
         UVthree="UVthree" + str(texquad)
         UVfour="UVfour" + str(texquad)
         
+        #texflag = 2, triangle? not always
+        #texflag = 4, transparency?
         #texflag = 11, flip 180
-        if texflag==11: #flip texture 180
+        #texflag = 128 ?
+        if texquad>x-1: #no texture if texture index is out of range
+            texquadx = ""
+            texquady = ""
+            texquadz = ""
+            texquadw = ""
+        elif texflag==2: #flag=2 triangle?
+            texquadx = "/" + str(materialdict[UVone])
+            texquady = "/" + str(materialdict[UVthree])
+            texquadz = "/" + str(materialdict[UVfour])
+            texquadw = ""
+        elif texflag==11: #flip texture 180
             texquadx = "/" + str(materialdict[UVtwo])
             texquady = "/" + str(materialdict[UVone])
             texquadz = "/" + str(materialdict[UVfour])
@@ -410,7 +157,12 @@ with open(model_file_name, 'rb') as inMOD:
             texquadw=""
         
         #print faces
-        print("usemtl " + materialdict[materialname] + "\nf " + str(xquad) + texquadx + " " + str(yquad) + texquady + " " + str(zquad) + texquadz + " " + str(wquad) + texquadw)
+        if texquad<x:
+            print("usemtl " + materialdict[materialname]) 
+        else:
+            print("usemtl TPxx") #texture index out of range, assign a dummy material for now
+            
+        print("f " + str(xquad) + texquadx + " " + str(yquad) + texquady + " " + str(zquad) + texquadz + " " + str(wquad) + texquadw)
             
         z=z+1
         
@@ -418,5 +170,7 @@ print("\nAlien Trilogy DOS Model Header Reader\n" + "\nmodel file name is " + mo
 + "\nvertex count (decimal) " + str(vertcount) + "\nface count (decimal) " + str(quadcount)  + "\nfaces start offset (decimal) " + str(quadstart) + "\nfaces end offset (decimal) " + str(quadend)
 + "\nvertex start offset (decimal) " + str(vertstart) + "\nvertex end offset (decimal) " + str(vertend))
 
-print("\nbin2obj.exe " + model_file_name + " -soff " + str(vertstart) + " -eoff " + str(vertend) + " -stri 2 -vtyp 1") #-fsof " + str(quadstart) + " -feof " + str(quadend) + " -fstr 4 -ftyp 1 -fquad")
+#bin2obj extract command
+print("\nbin2obj.exe " + model_file_name + " -soff " + str(vertstart) + " -eoff " + str(vertend) + " -stri 2 -vtyp 1") 
+#-fsof " + str(quadstart) + " -feof " + str(quadend) + " -fstr 4 -ftyp 1 -fquad")
         
